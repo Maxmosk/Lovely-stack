@@ -1,6 +1,5 @@
 #include "stack.h"
 
-#define CANARY_DEF 0
 
 void stack_ctor (stack *stk, size_t capacity, size_t elem_size)
 {
@@ -10,8 +9,6 @@ void stack_ctor (stack *stk, size_t capacity, size_t elem_size)
 	stk->elem_size = elem_size;
 	stk->capacity = capacity;
 	stk->size = stack_size_calc (stk);
-	//stk->status = 0;
-
 	stk->status.constructed = 1;
 	stk->top = 0;
 
@@ -28,6 +25,8 @@ void stack_ctor (stack *stk, size_t capacity, size_t elem_size)
 		stack_set_canary_header (stk, CANARY_DEF);
 		stack_set_canary_data (stk, CANARY_DEF);
 	#endif
+
+	stack_set_hash (stk);
 }
 
 void stack_push (stack *stk, uint8_t *value)
@@ -45,6 +44,9 @@ void stack_push (stack *stk, uint8_t *value)
 	meowcpy (stk->data + stk->elem_size * stk->top, value, stk->elem_size);
 
 	stk->top++;
+
+
+	stack_set_hash (stk);
 }
 
 void stack_pop (stack *stk, uint8_t *ret_mem)
@@ -63,6 +65,9 @@ void stack_pop (stack *stk, uint8_t *ret_mem)
 	stk->top--;
 
 	meowcpy (ret_mem, stk->data + stk->elem_size*stk->top, stk->elem_size);
+
+
+	stack_set_hash (stk);
 }
 
 void stack_resize (stack *stk, size_t growth_ratio)
@@ -91,6 +96,9 @@ void stack_resize (stack *stk, size_t growth_ratio)
 		stk->data = stk->data + sizeof (canary);
 		stack_set_canary_data (stk, CANARY_DEF);
 	#endif
+
+
+	stack_set_hash (stk);
 }
 
 size_t stack_size_calc (stack *stk)
@@ -265,6 +273,15 @@ void stack_check_canary_data (stack *stk)
 
 
 #ifndef NDEBUG_HASH
+void stack_set_hash (stack *stk)
+{
+	CHECK_POINTER(stk);
+
+
+	stk->data_hash = stack_data_hash_calc (stk);
+	stk->header_hash = stack_header_hash_calc (stk);
+}
+
 uint32_t stack_header_hash_calc (stack *stk)
 {
 	CHECK_POINTER_RET(stk);

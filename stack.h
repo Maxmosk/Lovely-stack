@@ -42,6 +42,11 @@
 #define STACK_CTOR(ptr, cap, type)				\
 	stack_ctor ((ptr), (cap), sizeof (type))
 
+/** @def CANARY_DEF
+ *  @brief The macro with default value of canary of stack
+ *  @note Used HEX-speak, that you can read as GIGA EL32 FOR DED32
+*/
+#define CANARY_DEF 0x919AE132F07DED32
 
 /** @typedef canary
  *  @brief The type of canary in stack header and data
@@ -191,6 +196,12 @@ void stack_check_canary_data (stack *stk);
 
 
 #ifndef NDEBUG_HASH
+/** @fn stack_set_hash
+ *  @brief The function to set values of hashes in stach
+ *  @param stk Pointer on stack for setting hashes
+*/
+void stack_set_hash (stack *stk);
+
 /** @fn stack_header_hash_calc
  *  @brief The function to calculate hash of stack header
  *  @param[in] stk Pointer on stack for calculation
