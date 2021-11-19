@@ -30,7 +30,7 @@ void stack_ctor (stack *stk, size_t capacity, size_t elem_size)
 	#endif
 }
 
-void stack_push (stack *stk, char *value)
+void stack_push (stack *stk, uint8_t *value)
 {
 	CHECK_POINTER(stk);
 	CHECK_POINTER(value);
@@ -47,7 +47,7 @@ void stack_push (stack *stk, char *value)
 	stk->top++;
 }
 
-void stack_pop (stack *stk, char *ret_mem)
+void stack_pop (stack *stk, uint8_t *ret_mem)
 {
 	CHECK_POINTER(stk);
 	CHECK_POINTER(ret_mem);
@@ -77,7 +77,7 @@ void stack_resize (stack *stk, size_t growth_ratio)
 		stk->data = stk->data - sizeof (canary);
 	#endif
 
-	printf ("%p\n", stk->data);
+
 	stk->data = realloc (stk->data, stk->size);
 
 	assert (stk->data != NULL);
@@ -112,7 +112,7 @@ size_t stack_size_calc (stack *stk)
 	return res;
 }
 
-void meowcpy (char *to_mem, char *from_mem, size_t n)
+void meowcpy (uint8_t *to_mem, uint8_t *from_mem, size_t n)
 {
 	CHECK_POINTER(to_mem);
 	CHECK_POINTER(from_mem);
@@ -260,5 +260,60 @@ void stack_check_canary_data (stack *stk)
 	{
 		stk->status.left_canary_data = 0;
 	}
+}
+#endif
+
+
+#ifndef NDEBUG_HASH
+uint32_t stack_header_hash_calc (stack *stk)
+{
+	CHECK_POINTER_RET(stk);
+
+
+	uint32_t backup = stk->header_hash;
+	stk->header_hash = 0;
+
+	uint32_t hash = hash_FAQ6 ((uint8_t *) stk, sizeof (stack));
+
+	stk->header_hash = backup;
+
+
+	return hash;
+}
+
+uint32_t stack_data_hash_calc (const stack *stk)
+{
+	CHECK_POINTER_RET(stk);
+	CHECK_POINTER_RET(stk->data);
+
+	uint8_t *data = stk->data;
+	#ifndef NDEBUG_CANARY
+		data -= sizeof (canary);
+	#endif
+
+
+	return hash_FAQ6 (data, stk->size);
+}
+
+uint32_t hash_FAQ6 (const uint8_t *mem_start, size_t n)
+{
+	CHECK_POINTER_RET(mem_start);
+
+
+	uint32_t hash = 0;
+
+	for (size_t i = 0; i < n; i++)
+	{
+		hash += (uint8_t) mem_start[i];
+		hash += (hash << 10);
+        hash ^= (hash >> 6);
+	}
+
+	hash += (hash << 3);
+	hash ^= (hash >> 11);
+	hash += (hash << 15);
+
+
+	return hash;
 }
 #endif

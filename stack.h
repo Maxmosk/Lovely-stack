@@ -6,12 +6,12 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-#define NDEBUG_CANARY
+
 
 /** @def CHECK_POINTER
  *  @brief The macro to check pointer
  *  @param[in] ASS_POINTER Pointer to check it
- *  @warning Can be used only in in 'void'-functions
+ *  @warning Can be used only in 'void'-functions
 */
 #define CHECK_POINTER(ASS_POINTER)				\
 	assert ((ASS_POINTER) != NULL);				\
@@ -19,6 +19,18 @@
 	{											\
 		return;									\
 	}
+
+/** @def CHECK_POINTER_RET
+ *  @brief The macro to check pointer
+ *  @param[in] POINTER_FISTING Pointer to check it
+ *  @warning Can be used only in functions with return
+*/
+#define CHECK_POINTER_RET(POINTER_FISTING)		\
+	assert ((POINTER_FISTING) != NULL);			\
+	if ((POINTER_FISTING) == NULL)				\
+	{											\
+		return 0;								\
+	}	
 
 /** @def STACK_CTOR
  *  @brief The macro to use stack_ctor more comfortable
@@ -47,6 +59,7 @@ typedef struct
 	unsigned destructed:1;
 	unsigned underflow:1;
 	unsigned memory_error:1;
+	unsigned unknowen_error:1;
 
 	#ifndef NDEBUG_CANARY
 		unsigned left_canary_header:1;
@@ -70,7 +83,7 @@ typedef struct
 		canary left_canary;
 	#endif
 
-	char *data;
+	uint8_t *data;
 	size_t elem_size;
 	stack_status status;
 	size_t capacity;
@@ -78,8 +91,8 @@ typedef struct
 	size_t top;
 
 	#ifndef NDEBUG_HASH
-		uint64_t data_hash;
-		uint64_t header_hash;
+		uint32_t data_hash;
+		uint32_t header_hash;
 	#endif
 
 	#ifndef NDEBUG_CANARY
@@ -101,14 +114,14 @@ void stack_ctor (stack *stk, size_t capacity, size_t elem_size);
  *  @param[out] stk Pointer on stack to push element to its data
  *  @param[in] ret_mem Pointer on element to push it
 */
-void stack_push (stack *stk, char *value);
+void stack_push (stack *stk, uint8_t *value);
 
 /** @fn stack_pop
  *  @brief The function to pop element from stack
  *  @param[in] stk Pointer on stack to pop element from it
  *  @param[out] ret_mem Pointer on memory to return element
 */
-void stack_pop (stack *stk, char *ret_mem);
+void stack_pop (stack *stk, uint8_t *ret_mem);
 
 /** @fn stack_resize
  *  @brief Function to resize array of data of stack
@@ -135,7 +148,7 @@ size_t stack_size_calc (stack *stk);
  *  @param[in] from_mem Pointer on memory for copying data from it
  *  @param[in] n Quantity of bytes to copy
 */
-void meowcpy (char *to_mem, char *from_mem, size_t n);
+void meowcpy (uint8_t *to_mem, uint8_t *from_mem, size_t n);
 
 /** @fn stack_dtor
  *  @brief The function to destroy stack
@@ -144,6 +157,7 @@ void meowcpy (char *to_mem, char *from_mem, size_t n);
  * 					information about this in status
 */
 void stack_dtor (stack *stk);
+
 
 #ifndef NDEBUG_CANARY
 /** @fn stack_set_canary_header
@@ -173,6 +187,35 @@ void stack_check_canary_header (stack *stk);
  *  @note Writes status of canary in status of stack
 */
 void stack_check_canary_data (stack *stk);
+#endif
+
+
+#ifndef NDEBUG_HASH
+/** @fn stack_header_hash_calc
+ *  @brief The function to calculate hash of stack header
+ *  @param[in] stk Pointer on stack for calculation
+ *  @return Value of 'hash_FAQ6' for stack header
+ *  @note This function resets value of stack header hash to zero
+ *  @warning If stk is null-pointer then it returns 0
+*/
+uint32_t stack_header_hash_calc (stack *stk);
+
+/** @fn stack_data_hash_calc
+ *  @brief The function to calculate hash of stack data
+ *  @param[in] stk Pointer on stack for calculation
+ *  @return Value of 'hash_FAQ6' for data array
+ *  @warning If stk is null-pointer then it returns 0
+*/
+uint32_t stack_data_hash_calc (const stack *stk);
+
+/** @fn hash_FAQ6
+ *  @brief The function to calculate FAQ6-hash of memory
+ *  @param[in] mem_start Pointer of first byte of memory
+ *  @param[in] n Quantity of bytes to calculate function
+ *  @return Value of function by FAQ6-algorithm
+ *  @warning If mem_start is null-pointer then it returns 0
+*/
+uint32_t hash_FAQ6 (const uint8_t *mem_start, size_t n);
 #endif
 
 #endif
