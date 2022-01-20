@@ -3,34 +3,14 @@
 
 
 #include <assert.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include "meowcpy.h"
+#include "helper.h"
 
-
-/** @def CHECK_POINTER
- *  @brief The macro to check pointer
- *  @param[in] ASS_POINTER Pointer to check it
- *  @warning Can be used only in 'void'-functions
-*/
-#define CHECK_POINTER(ASS_POINTER)				\
-	assert ((ASS_POINTER) != NULL);				\
-	if ((ASS_POINTER) == NULL)					\
-	{											\
-		return;									\
-	}
-
-/** @def CHECK_POINTER_RET
- *  @brief The macro to check pointer
- *  @param[in] POINTER_FISTING Pointer to check it
- *  @warning Can be used only in functions with return
-*/
-#define CHECK_POINTER_RET(POINTER_FISTING)		\
-	assert ((POINTER_FISTING) != NULL);			\
-	if ((POINTER_FISTING) == NULL)				\
-	{											\
-		return 0;								\
-	}	
 
 /** @def STACK_CTOR
  *  @brief The macro to use stack_ctor more comfortable
@@ -40,13 +20,25 @@
  *  @note Type is data type as 'int', 'float', 'char *', etc
 */
 #define STACK_CTOR(ptr, cap, type)				\
-	stack_ctor ((ptr), (cap), sizeof (type))
+    memset(ptr, 0, sizeof(stack));             \
+	stack_ctor ((ptr), (cap), sizeof (type));
 
 /** @def CANARY_DEF
  *  @brief The macro with default value of canary of stack
  *  @note Used HEX-speak, that you can read as GIGA EL32 FOR DED32
 */
 #define CANARY_DEF 0x919AE132F07DED32
+
+/** @def GROWTH_FACTOR
+ *  @brief The macro with default value of growth factor of stack
+*/
+#define GROWTH_FACTOR 2
+
+/** @def DUMP_FILE
+ *  @brief The macro with name of dump file of stack
+*/
+#define DUMP_FILE "log.txt"
+
 
 /** @typedef canary
  *  @brief The type of canary in stack header and data
@@ -106,6 +98,13 @@ typedef struct
 } stack;
 
 
+enum STACK_CHECK_CODES
+{
+    OK      = 0,
+    ERROR   = 1
+};
+
+
 /** @fn stack_ctor
  *  @brief The function to construct stack
  *  @param[out] stk Pointer on stack header for constructing
@@ -147,14 +146,6 @@ void stack_resize (stack *stk, size_t growth_ratio);
 */
 size_t stack_size_calc (stack *stk);
 
-/** @fn meowcpy
- *  @brief The function to copy memory very fast
- *  @param[out] to_mem Pointer on memory for copying to it
- *  @param[in] from_mem Pointer on memory for copying data from it
- *  @param[in] n Quantity of bytes to copy
-*/
-void meowcpy (uint8_t *to_mem, uint8_t *from_mem, size_t n);
-
 /** @fn stack_dtor
  *  @brief The function to destroy stack
  *  @param[out] stk Pointer on stack to destroy it
@@ -163,6 +154,9 @@ void meowcpy (uint8_t *to_mem, uint8_t *from_mem, size_t n);
 */
 void stack_dtor (stack *stk);
 
+uint8_t stack_check (stack *stk);
+
+uint8_t stack_check_status (stack *stk);
 
 #ifndef NDEBUG_CANARY
 /** @fn stack_set_canary_header
@@ -229,4 +223,6 @@ uint32_t stack_data_hash_calc (const stack *stk);
 uint32_t hash_FAQ6 (const uint8_t *mem_start, size_t n);
 #endif
 
+
 #endif
+

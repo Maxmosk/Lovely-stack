@@ -20,14 +20,17 @@ void stack_ctor (stack *stk, size_t capacity, size_t elem_size)
 		stk->status.memory_error = 1;
 	}
 
+	
 	#ifndef NDEBUG_CANARY
 		stk->data += sizeof (canary);
 		stack_set_canary_header (stk, CANARY_DEF);
 		stack_set_canary_data (stk, CANARY_DEF);
 	#endif
-
+    
+    
 	stack_set_hash (stk);
 }
+
 
 void stack_push (stack *stk, uint8_t *value)
 {
@@ -37,7 +40,7 @@ void stack_push (stack *stk, uint8_t *value)
 
 	if (stk->top == stk->capacity)
 	{
-		stack_resize (stk, 2);
+		stack_resize (stk, GROWTH_FACTOR);
 	}
 
 
@@ -48,6 +51,7 @@ void stack_push (stack *stk, uint8_t *value)
 
 	stack_set_hash (stk);
 }
+
 
 void stack_pop (stack *stk, uint8_t *ret_mem)
 {
@@ -70,11 +74,12 @@ void stack_pop (stack *stk, uint8_t *ret_mem)
 	stack_set_hash (stk);
 }
 
+
 void stack_resize (stack *stk, size_t growth_ratio)
 {
 	CHECK_POINTER(stk);
 
-
+    
 	stk->capacity = growth_ratio * stk->capacity;
 	stk->size = stack_size_calc (stk);
 
@@ -101,13 +106,10 @@ void stack_resize (stack *stk, size_t growth_ratio)
 	stack_set_hash (stk);
 }
 
+
 size_t stack_size_calc (stack *stk)
 {
-	assert (stk != NULL);
-	if (stk == NULL)
-	{
-		return -1;
-	}
+	CHECK_POINTER_RET(stk, SIZE_MAX);
 
 
 	size_t res = stk->capacity * stk->elem_size;
@@ -120,62 +122,6 @@ size_t stack_size_calc (stack *stk)
 	return res;
 }
 
-void meowcpy (uint8_t *to_mem, uint8_t *from_mem, size_t n)
-{
-	CHECK_POINTER(to_mem);
-	CHECK_POINTER(from_mem);
-	
-	
-	uint64_t buffer = 0;
-	
-	while (n >= sizeof (uint64_t))
-	{
-		buffer = *((uint64_t *) from_mem);
-		
-		*((uint64_t *) to_mem) = buffer;
-		
-		to_mem += sizeof (uint64_t);
-		from_mem += sizeof (uint64_t);
-		
-		n -= sizeof (uint64_t);
-	}
-	
-	
-	while (n >= sizeof (uint32_t))
-	{
-		buffer = *((uint32_t *) from_mem);
-		*((uint32_t *) to_mem) = (uint32_t) buffer;
-		
-		to_mem += sizeof (uint32_t);
-		from_mem += sizeof (uint32_t);
-		
-		n -= sizeof (uint32_t);
-	}
-	
-	
-	while (n >= sizeof (uint16_t))
-	{
-		buffer = *((uint16_t *) from_mem);
-		*((uint16_t *) to_mem) = (uint16_t) buffer;
-		
-		to_mem += sizeof (uint16_t);
-		from_mem += sizeof (uint16_t);
-		
-		n -= sizeof (uint16_t);
-	}
-	
-	
-	while (n >= sizeof (uint8_t))
-	{
-		buffer = *((uint8_t *) from_mem);
-		*((uint8_t *) to_mem) = (uint8_t) buffer;
-		
-		to_mem += sizeof (uint8_t);
-		from_mem += sizeof (uint8_t);
-		
-		n -= sizeof (uint8_t);
-	}
-}
 
 void stack_dtor (stack *stk)
 {
@@ -193,25 +139,42 @@ void stack_dtor (stack *stk)
 }
 
 
+uint8_t stack_check (stack *stk)
+{
+    CHECK_POINTER_RET(stk, ERROR);
+    
+    
+    FILE *dump = fopen (DUMP_FILE, "a+");
+    
+    fprintf (dump, "Fisting\n");
+    
+    
+    return OK;
+}
+
+
+
 #ifndef NDEBUG_CANARY
 void stack_set_canary_header (stack *stk, canary value)
 {
 	CHECK_POINTER(stk);
 
-
+    
 	stk->left_canary = value;
 	stk->right_canary = value;
 }
+
 
 void stack_set_canary_data (stack *stk, canary value)
 {
 	CHECK_POINTER(stk);
 	CHECK_POINTER(stk->data);
 
-
+    
 	*((canary *) (stk->data - sizeof (canary))) = value;
 	*((canary *) (stk->data + stk->elem_size*stk->capacity)) = value;
 }
+
 
 void stack_check_canary_header (stack *stk)
 {
@@ -240,6 +203,7 @@ void stack_check_canary_header (stack *stk)
 		stk->status.left_canary_header = 0;
 	}
 }
+
 
 void stack_check_canary_data (stack *stk)
 {
@@ -272,6 +236,7 @@ void stack_check_canary_data (stack *stk)
 #endif
 
 
+
 #ifndef NDEBUG_HASH
 void stack_set_hash (stack *stk)
 {
@@ -282,9 +247,10 @@ void stack_set_hash (stack *stk)
 	stk->header_hash = stack_header_hash_calc (stk);
 }
 
+
 uint32_t stack_header_hash_calc (stack *stk)
 {
-	CHECK_POINTER_RET(stk);
+	CHECK_POINTER_RET(stk, 0);
 
 
 	uint32_t backup = stk->header_hash;
@@ -298,10 +264,12 @@ uint32_t stack_header_hash_calc (stack *stk)
 	return hash;
 }
 
+
 uint32_t stack_data_hash_calc (const stack *stk)
 {
-	CHECK_POINTER_RET(stk);
-	CHECK_POINTER_RET(stk->data);
+	CHECK_POINTER_RET(stk, 0);
+	CHECK_POINTER_RET(stk->data, 0);
+
 
 	uint8_t *data = stk->data;
 	#ifndef NDEBUG_CANARY
@@ -312,9 +280,10 @@ uint32_t stack_data_hash_calc (const stack *stk)
 	return hash_FAQ6 (data, stk->size);
 }
 
+
 uint32_t hash_FAQ6 (const uint8_t *mem_start, size_t n)
 {
-	CHECK_POINTER_RET(mem_start);
+	CHECK_POINTER_RET(mem_start, 0);
 
 
 	uint32_t hash = 0;
@@ -334,3 +303,4 @@ uint32_t hash_FAQ6 (const uint8_t *mem_start, size_t n)
 	return hash;
 }
 #endif
+
