@@ -11,7 +11,7 @@ CFLAGS+= -Wformat=2 -Werror -Winit-self -Wuninitialized -Wpointer-arith -save-te
 CFLAGS+= -Wold-style-definition -Wstrict-prototypes -Wmissing-prototypes 
 CFLAGS+= -Werror-implicit-function-declaration -Wlogical-op -Wduplicated-cond
 CFLAGS+= -Wcast-qual -Wcast-align -Wformat-security 
-CFLAGS+= -lasan #-fsanitize=address,leak,undefined -fstack-protector 
+CFLAGS+= -lasan -fsanitize=address,leak,undefined -fstack-protector 
 CFLAGS+= -s -masm=intel -pedantic -std=c99 -o
 
 
