@@ -28,7 +28,9 @@ void stack_ctor (stack *stk, size_t capacity, size_t elem_size)
 	#endif
     
     
-	stack_set_hash (stk);
+    #ifndef NDEBUG_HASH
+    	stack_set_hash (stk);
+    #endif
 }
 
 
@@ -48,8 +50,10 @@ void stack_push (stack *stk, uint8_t *value)
 
 	stk->top++;
 
-
-	stack_set_hash (stk);
+    
+    #ifndef NDEBUG_HASH
+    	stack_set_hash (stk);
+    #endif
 }
 
 
@@ -71,7 +75,9 @@ void stack_pop (stack *stk, uint8_t *ret_mem)
 	meowcpy (ret_mem, stk->data + stk->elem_size*stk->top, stk->elem_size);
 
 
-	stack_set_hash (stk);
+	#ifndef NDEBUG_HASH
+    	stack_set_hash (stk);
+    #endif
 }
 
 
@@ -103,7 +109,9 @@ void stack_resize (stack *stk, size_t growth_ratio)
 	#endif
 
 
-	stack_set_hash (stk);
+	#ifndef NDEBUG_HASH
+    	stack_set_hash (stk);
+    #endif
 }
 
 
@@ -136,20 +144,6 @@ void stack_dtor (stack *stk)
 	
 	free (stk->data);
 	stk->data = NULL;
-}
-
-
-uint8_t stack_check (stack *stk)
-{
-    CHECK_POINTER_RET(stk, ERROR);
-    
-    
-    FILE *dump = fopen (DUMP_FILE, "a+");
-    
-    fprintf (dump, "Fisting\n");
-    
-    
-    return OK;
 }
 
 

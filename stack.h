@@ -2,14 +2,18 @@
 #define STACK_H_INCLUDED
 
 
+#include "stack_config.h"
+
 #include <assert.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include "meowcpy.h"
+
 #include "helper.h"
+#include "meowcpy.h"
 
 
 /** @def STACK_CTOR
@@ -20,7 +24,7 @@
  *  @note Type is data type as 'int', 'float', 'char *', etc
 */
 #define STACK_CTOR(ptr, cap, type)				\
-    memset(ptr, 0, sizeof(stack));             \
+    memset(ptr, 0, sizeof(stack));              \
 	stack_ctor ((ptr), (cap), sizeof (type));
 
 /** @def CANARY_DEF
@@ -33,11 +37,6 @@
  *  @brief The macro with default value of growth factor of stack
 */
 #define GROWTH_FACTOR 2
-
-/** @def DUMP_FILE
- *  @brief The macro with name of dump file of stack
-*/
-#define DUMP_FILE "log.txt"
 
 
 /** @typedef canary
@@ -154,9 +153,22 @@ size_t stack_size_calc (stack *stk);
 */
 void stack_dtor (stack *stk);
 
-uint8_t stack_check (stack *stk);
+/** @fn stack_check
+ *  @brief The function to check stack for errors
+ *  @param[in] stk Pointer to stack for checking
+ *  @param[out] dump_path Path of file for writing stack status
+ *  @return Code from enum STACK_CHECK_CODES
+*/
+uint8_t stack_check (stack *stk, const char *dump_path);
 
-uint8_t stack_check_status (stack *stk);
+/** @fn stack_print_elem
+ *  @brief Function for wriring of stack element
+ *  @param[out] out_file Pointer to file for writing
+ *  @param[in] value Pointer to memory with element
+ *  @note This function must be descripted by user
+*/
+void stack_print_elem (FILE *out_file, uint8_t *value);
+
 
 #ifndef NDEBUG_CANARY
 /** @fn stack_set_canary_header
