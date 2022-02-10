@@ -1,7 +1,7 @@
 #include "stack.h"
 
 
-void stack_ctor (stack *stk, size_t capacity, size_t elem_size)
+void stack_ctor (stack *stk, size_t capacity, size_t elem_size, const char *dump)
 {
 	CHECK_POINTER(stk);
 
@@ -27,6 +27,9 @@ void stack_ctor (stack *stk, size_t capacity, size_t elem_size)
 		stack_set_canary_data (stk, CANARY_DEF);
 	#endif
     
+    #ifndef NDEBUG_DUMP
+        stk->dump = dump;
+    #endif
     
     #ifndef NDEBUG_HASH
     	stack_set_hash (stk);

@@ -23,9 +23,9 @@
  *  @param[in] type Type of element of data in stack
  *  @note Type is data type as 'int', 'float', 'char *', etc
 */
-#define STACK_CTOR(ptr, cap, type)				\
+#define STACK_CTOR(ptr, cap, type, dmp)			\
     memset(ptr, 0, sizeof(stack));              \
-	stack_ctor ((ptr), (cap), sizeof (type));
+	stack_ctor ((ptr), (cap), sizeof (type), dmp);
 
 /** @def CANARY_DEF
  *  @brief The macro with default value of canary of stack
@@ -85,7 +85,11 @@ typedef struct
 	size_t capacity;
 	size_t size;
 	size_t top;
-
+    
+    #ifndef NDEBUG_DUMP
+        const char *dump;
+    #endif
+    
 	#ifndef NDEBUG_HASH
 		uint32_t data_hash;
 		uint32_t header_hash;
@@ -110,7 +114,7 @@ enum STACK_CHECK_CODES
  *  @param[in] capacity Capacity of stack after constructing
  *  @param[in] elem_size Size of one element of data in stack
 */
-void stack_ctor (stack *stk, size_t capacity, size_t elem_size);
+void stack_ctor (stack *stk, size_t capacity, size_t elem_size, const char *dump);
 
 /** @fn stack_push
  *  @brief The function to push new element to stack
@@ -156,10 +160,9 @@ void stack_dtor (stack *stk);
 /** @fn stack_check
  *  @brief The function to check stack for errors
  *  @param[in] stk Pointer to stack for checking
- *  @param[out] dump_path Path of file for writing stack status
  *  @return Code from enum STACK_CHECK_CODES
 */
-uint8_t stack_check (stack *stk, const char *dump_path);
+uint8_t stack_check (stack *stk);
 
 /** @fn stack_print_elem
  *  @brief Function for wriring of stack element
