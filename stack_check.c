@@ -97,12 +97,12 @@ static uint8_t stack_check_status (stack *stk, FILE *dump)
 }
 
 
-uint8_t stack_check (stack *stk, const char *dump_path)
+uint8_t stack_check (stack *stk)
 {
     CHECK_POINTER_RET(stk, ERROR);
     CHECK_POINTER_RET(stk->data, ERROR);
     #ifndef NDEBUG_DUMP
-        CHECK_POINTER_RET(dump_path, ERROR);
+        CHECK_POINTER_RET(stk->dump, ERROR);
     #endif
     
     
@@ -118,7 +118,7 @@ uint8_t stack_check (stack *stk, const char *dump_path)
     
     
     #ifndef NDEBUG_DUMP
-        FILE *dump = fopen (dump_path, "a+");
+        FILE *dump = fopen (stk->dump, "a+");
         CHECK_POINTER_RET(dump, ERROR);
         
         fprintf (dump, "Stack checking started!\n");
