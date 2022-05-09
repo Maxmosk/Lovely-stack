@@ -1,7 +1,7 @@
 .PHONY: all clean run dump
 
 include CMakefile
-CFLAGS=$(CFLAGS_WARNINGS) $(CFLAGS_FLAGS) $(CFLAGS_SYNTAX)
+CFLAGS=$(CFLAGS_WARNINGS) $(CFLAGS_FLAGS) $(CFLAGS_SYNTAX) $(CFLAGS_DEBUG)
 
 
 all: testprog
