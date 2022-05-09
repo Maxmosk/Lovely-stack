@@ -15,7 +15,7 @@
 #include "helper.h"
 #include "meowcpy.h"
 
-
+#ifndef NDEBUG_DUMP
 /** @def STACK_CTOR
  *  @brief The macro to use stack_ctor more comfortable
  *  @param[out] ptr Pointer on stack header for constructing
@@ -23,9 +23,14 @@
  *  @param[in] type Type of element of data in stack
  *  @note Type is data type as 'int', 'float', 'char *', etc
 */
-#define STACK_CTOR(ptr, cap, type, dmp)			\
+#define STACK_CTOR(ptr, cap, type, dmp)         \
     memset(ptr, 0, sizeof(stack));              \
 	stack_ctor ((ptr), (cap), sizeof (type), dmp);
+#else
+#define STACK_CTOR(ptr, cap, type)              \
+    memset(ptr, 0, sizeof(stack));              \
+	stack_ctor ((ptr), (cap), sizeof (type));
+#endif
 
 /** @def CANARY_DEF
  *  @brief The macro with default value of canary of stack
@@ -114,7 +119,11 @@ enum STACK_CHECK_CODES
  *  @param[in] capacity Capacity of stack after constructing
  *  @param[in] elem_size Size of one element of data in stack
 */
+#ifndef NDEBUG_DUMP
 void stack_ctor (stack *stk, size_t capacity, size_t elem_size, const char *dump);
+#else
+void stack_ctor (stack *stk, size_t capacity, size_t elem_size);
+#endif
 
 /** @fn stack_push
  *  @brief The function to push new element to stack

@@ -1,0 +1,12 @@
+CC=gcc
+CFLAGS_WARNINGS=-Wall -Wextra -Wfloat-equal -Wundef -Wshadow -Wpointer-arith \
+    -Wcast-align -Wstrict-prototypes -Wstrict-overflow=5 -Wwrite-strings \
+    -Waggregate-return -Wcast-qual -Wswitch-default -Wswitch-enum -Wconversion \
+    -Wunreachable-code -Wformat=2 -Werror -Winit-self -Wuninitialized \
+    -Wpointer-arith -Wold-style-definition -Wstrict-prototypes \
+    -Wmissing-prototypes -Werror-implicit-function-declaration -Wlogical-op \
+    -Wduplicated-cond -Wcast-qual -Wcast-align -Wformat-security
+CFLAGS_FLAGS=-fsanitize=address,leak,undefined -fstack-protector
+CFLAGS_SYNTAX=-pedantic -std=c99
+CFLAGS_LINK=-lasan
+

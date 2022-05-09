@@ -35,7 +35,11 @@ static uint8_t stack_check_print_data (stack *stk, FILE *dump)
  *  @param[out] dump Pointer to file for printing
  *  @return Code from enum STACK_CHECK_CODES
 */
+#ifndef NDEBUG_DUMP
 static uint8_t stack_check_status (stack *stk, FILE *dump)
+#else
+static uint8_t stack_check_status (stack *stk)
+#endif
 {
     CHECK_POINTER_RET(stk, ERROR);
     #ifndef NDEBUG_DUMP
@@ -209,7 +213,11 @@ uint8_t stack_check (stack *stk)
         }
     #endif
     
+    #ifndef NDEBUG_DUMP
     uint8_t status_of_status = stack_check_status (stk, dump);
+    #else
+    uint8_t status_of_status = stack_check_status (stk);
+    #endif
     stack_ok = stack_ok && (status_of_status == OK);
     
     

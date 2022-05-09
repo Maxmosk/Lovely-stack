@@ -1,7 +1,11 @@
 #include "stack.h"
 
 
+#ifndef NDEBUG_DUMP
 void stack_ctor (stack *stk, size_t capacity, size_t elem_size, const char *dump)
+#else
+void stack_ctor (stack *stk, size_t capacity, size_t elem_size)
+#endif
 {
 	CHECK_POINTER(stk);
 

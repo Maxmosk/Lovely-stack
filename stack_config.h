@@ -6,7 +6,7 @@
  *  @brief The macro to off dump defence
  *  @note Remove comment to on defence and add comment to off defence
 */
-//#define NDEBUG_DUMP
+#define NDEBUG_DUMP
 
 /** @def NDEBUG_DUMP
  *  @brief The macro to off canary defence
