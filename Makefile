@@ -3,20 +3,17 @@
 include CMakefile
 CFLAGS=$(CFLAGS_WARNINGS) $(CFLAGS_FLAGS) $(CFLAGS_SYNTAX) $(CFLAGS_DEBUG)
 
+OBJFILES=main.o stack.o meowcpy.o stack_check.o
+HEADFILES=helper.h meowcpy.h stack_config.h stack.h
+
 
 all: testprog
 
-testprog: main.o stack.o meowcpy.o stack_check.o
+testprog: $(OBJFILES)
 	$(CC) $(CFLAGS) $(CFLAGS_LINK) -o testprog main.o stack.o meowcpy.o stack_check.o
 
-main.o: main.c
-	$(CC) -c $(CFLAGS) -o main.o main.c
-stack.o: stack.c
-	$(CC) -c $(CFLAGS) -o stack.o stack.c
-stack_check.o: stack_check.c
-	$(CC) -c $(CFLAGS) -o stack_check.o stack_check.c
-meowcpy.o: meowcpy.c
-	$(CC) -c $(CFLAGS) -o meowcpy.o meowcpy.c
+%.o: %.c $(HEADFILES)
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 
 clean:
