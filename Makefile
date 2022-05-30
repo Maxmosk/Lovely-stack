@@ -20,7 +20,7 @@ clean:
 	rm -rf *.o *.i *.dump *.s testprog log.txt
 
 
-run:
+run: testprog
 	./testprog
 	@echo 
 	@echo 
@@ -32,6 +32,6 @@ run:
 	@echo ====================================================================================
 
 
-dump:
+dump: testprog
 	objdump -M intel -d testprog > testprog.dump
 
