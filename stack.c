@@ -26,18 +26,18 @@ void stack_ctor (stack *stk, size_t capacity, size_t elem_size)
 
 	
 	#ifndef NDEBUG_CANARY
-		stk->data += sizeof (canary);
-		stack_set_canary_header (stk, CANARY_DEF);
-		stack_set_canary_data (stk, CANARY_DEF);
+	stk->data += sizeof (canary);
+	stack_set_canary_header (stk, CANARY_DEF);
+	stack_set_canary_data (stk, CANARY_DEF);
 	#endif
     
-    #ifndef NDEBUG_DUMP
-        stk->dump = dump;
-    #endif
+	#ifndef NDEBUG_DUMP
+	stk->dump = dump;
+	#endif
     
-    #ifndef NDEBUG_HASH
-    	stack_set_hash (stk);
-    #endif
+	#ifndef NDEBUG_HASH
+	stack_set_hash (stk);
+	#endif
 }
 
 
@@ -58,9 +58,9 @@ void stack_push (stack *stk, uint8_t *value)
 	stk->top++;
 
     
-    #ifndef NDEBUG_HASH
-    	stack_set_hash (stk);
-    #endif
+	#ifndef NDEBUG_HASH
+	stack_set_hash (stk);
+	#endif
 }
 
 
@@ -83,8 +83,8 @@ void stack_pop (stack *stk, uint8_t *ret_mem)
 
 
 	#ifndef NDEBUG_HASH
-    	stack_set_hash (stk);
-    #endif
+	stack_set_hash (stk);
+	#endif
 }
 
 
@@ -97,7 +97,7 @@ void stack_resize (stack *stk, size_t growth_ratio)
 	stk->size = stack_size_calc (stk);
 
 	#ifndef NDEBUG_CANARY
-		stk->data = stk->data - sizeof (canary);
+	stk->data = stk->data - sizeof (canary);
 	#endif
 
 
@@ -111,14 +111,14 @@ void stack_resize (stack *stk, size_t growth_ratio)
 	}
 
 	#ifndef NDEBUG_CANARY
-		stk->data = stk->data + sizeof (canary);
-		stack_set_canary_data (stk, CANARY_DEF);
+	stk->data = stk->data + sizeof (canary);
+	stack_set_canary_data (stk, CANARY_DEF);
 	#endif
 
 
 	#ifndef NDEBUG_HASH
-    	stack_set_hash (stk);
-    #endif
+	stack_set_hash (stk);
+	#endif
 }
 
 
@@ -130,7 +130,7 @@ size_t stack_size_calc (stack *stk)
 	size_t res = stk->capacity * stk->elem_size;
 
 	#ifndef NDEBUG_CANARY
-		res += sizeof (canary) * 2;
+	res += sizeof (canary) * 2;
 	#endif
 	
 
@@ -146,7 +146,7 @@ void stack_dtor (stack *stk)
 	stk->status.destructed = 1;
 	
 	#ifndef NDEBUG_CANARY
-		stk->data -= sizeof (canary);
+	stk->data -= sizeof (canary);
 	#endif
 	
 	free (stk->data);
@@ -274,7 +274,7 @@ uint32_t stack_data_hash_calc (const stack *stk)
 
 	uint8_t *data = stk->data;
 	#ifndef NDEBUG_CANARY
-		data -= sizeof (canary);
+	data -= sizeof (canary);
 	#endif
 
 
