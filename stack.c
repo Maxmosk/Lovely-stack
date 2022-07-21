@@ -212,9 +212,9 @@ void stack_check_canary_data (stack *stk)
 
 
 	int left_alive = (*((canary *) (stk->data - sizeof (canary)))
-														== CANARY_DEF);
+		== CANARY_DEF);
 	int right_alive = (*((canary *) (stk->data + stk->elem_size*stk->capacity))
-														== CANARY_DEF);
+		== CANARY_DEF);
 
 	if (right_alive)
 	{
@@ -293,7 +293,7 @@ uint32_t hash_FAQ6 (const uint8_t *mem_start, size_t n)
 	{
 		hash += (uint8_t) mem_start[i];
 		hash += (hash << 10);
-        hash ^= (hash >> 6);
+		hash ^= (hash >> 6);
 	}
 
 	hash += (hash << 3);
